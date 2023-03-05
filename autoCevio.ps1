@@ -3,7 +3,7 @@
 [int] $endX = 1276
 [int] $endY = 1015
 [int] $maxBar = 8
-[int] $barWidth = 128
+[int] $barWidth = 80 # 80 / 128 ?
 [int] $noteHeight = 24
 [int] $lines = 14 # 7 == 1 octave
 # [int] $fullLines = 24 # 12 == 1 octave
@@ -30,7 +30,11 @@ $signature=@'
 [DllImport("user32.dll",CharSet=CharSet.Auto,CallingConvention=CallingConvention.StdCall)]
 public static extern void mouse_event(long dwFlags, long dx, long dy, long cButtons, long dwExtraInfo);
 '@
-$SendMouseClick = Add-Type -memberDefinition $signature -name "Win32MouseEventNew" -namespace Win32Functions -passThru
+# $SendMouseClick = Add-Type -memberDefinition $signature -name "Win32MouseEventNew" -namespace Win32Functions -passThru
+$SendMouseEvent = Add-Type -memberDefinition $signature -name "Win32MouseEventNew" -namespace Win32Functions -passThru
+$MouseMove = 0x00000001
+$MouseLeftDown = 0x0002
+$MouseLeftUp = 0x0004
 
 # back to the previous window
 # ALT + TAB (move to the previous window)
@@ -79,14 +83,15 @@ function writeNote($x, $y, $w, $ets){
     [int] $next = $x + $w
     [System.Windows.Forms.Cursor]::Position = New-Object System.Drawing.Point($x, $y)
     Start-Sleep -m $interval
-    $SendMouseClick::mouse_event(0x0002, 0, 0, 0, 0);
+    $SendMouseEvent::mouse_event($MouseLeftDown, 0, 0, 0, 0);
+    # Start-Sleep -m $interval
+    # [System.Windows.Forms.Cursor]::Position = New-Object System.Drawing.Point($end, $y)
+    $SendMouseEvent::mouse_event($MouseMove, $w, 0, 0, 0)
+    # Start-Sleep -m $interval
+    $SendMouseEvent::mouse_event($MouseLeftUp, 0, 0, 0, 0);
     Start-Sleep -m $interval
-    [System.Windows.Forms.Cursor]::Position = New-Object System.Drawing.Point($end, $y)
-    Start-Sleep -m $interval
-    $SendMouseClick::mouse_event(0x0004, 0, 0, 0, 0);
-    Start-Sleep -m $interval
-    [System.Windows.Forms.Cursor]::Position = New-Object System.Drawing.Point($next, $y)
-    Start-Sleep -m $interval
+    # [System.Windows.Forms.Cursor]::Position = New-Object System.Drawing.Point($next, $y)
+    # Start-Sleep -m $interval
     
     [int[]] $tempArray = @($end, $ste, $next)
     varDump $tempArray
