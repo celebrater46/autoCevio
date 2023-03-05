@@ -3,7 +3,7 @@
 [int] $endX = 1276
 [int] $endY = 1015
 [int] $maxBar = 8
-[int] $barWidth = 80 # 80 / 128 ?
+[int] $barWidth = 64 # 80 / 128 ?
 [int] $noteHeight = 24
 [int] $lines = 14 # 7 == 1 octave
 # [int] $fullLines = 24 # 12 == 1 octave
@@ -17,7 +17,7 @@
 # [int] $notes = $maxBar * $shortestNote
 # [int] $xGap = ($endX-$startX)/$notes
 # [int] $yGap = ($endY-$startY)/$fullLines
-[int] $interval = 3 # msec 
+[int] $interval = 300 # msec 
 [int] $tempo = 120
 [int] $times = 1
 
@@ -78,26 +78,39 @@ function varDump($array){
 }
 
 function writeNote($x, $y, $w, $ets){
-    [int] $end = $x + $ste
-    [int] $ste = $w - $ets
-    [int] $next = $x + $w
-    [System.Windows.Forms.Cursor]::Position = New-Object System.Drawing.Point($x, $y)
-    Start-Sleep -m $interval
+    [int] $distance = (($w * 57) / 100) - 5
+    # [int] $ste = $w - $ets
+    # [int] $next = $x + $w
     $SendMouseEvent::mouse_event($MouseLeftDown, 0, 0, 0, 0);
-    # Start-Sleep -m $interval
+    Start-Sleep -m $interval
     # [System.Windows.Forms.Cursor]::Position = New-Object System.Drawing.Point($end, $y)
-    $SendMouseEvent::mouse_event($MouseMove, $w, 0, 0, 0)
-    # Start-Sleep -m $interval
+    $SendMouseEvent::mouse_event($MouseMove, $distance, 0, 0, 0)
+    Start-Sleep -m $interval
     $SendMouseEvent::mouse_event($MouseLeftUp, 0, 0, 0, 0);
     Start-Sleep -m $interval
     # [System.Windows.Forms.Cursor]::Position = New-Object System.Drawing.Point($next, $y)
-    # Start-Sleep -m $interval
+    $SendMouseEvent::mouse_event($MouseMove, 5, 0, 0, 0)
+    Start-Sleep -m $interval
     
-    [int[]] $tempArray = @($end, $ste, $next)
+    [int[]] $tempArray = @($w, $distance)
     varDump $tempArray
 }
 
 $notesObject = New-Object CevioNote
 $notesObject.init($startX, $startY, $barWidth/16, 'i')
 # $notesObject.writeNote($startX, $startY, $barWidth/16, 'i')
+
+[System.Windows.Forms.Cursor]::Position = New-Object System.Drawing.Point($startX, $startY)
+Start-Sleep -m $interval
+
 writeNote $startX $startY $barWidth $endToStart
+writeNote ($startX+$barWidth) $startY $barWidth $endToStart
+writeNote ($startX+$barWidth+$barWidth) $startY $barWidth $endToStart
+writeNote ($startX+$barWidth+$barWidth) $startY $barWidth $endToStart
+writeNote ($startX+$barWidth+$barWidth+$barWidth) $startY $barWidth $endToStart
+writeNote ($startX+$barWidth+$barWidth+$barWidth+$barWidth) $startY $barWidth $endToStart
+writeNote ($startX+$barWidth+$barWidth+$barWidth+$barWidth+$barWidth) $startY $barWidth $endToStart
+
+# 230305 NOTE
+# It is too difficult to calculate the distance of the mouse moving...
+# I guess that need an array has adjustment values of each note length.
