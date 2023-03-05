@@ -3,7 +3,7 @@
 [int] $endX = 1276
 [int] $endY = 1015
 [int] $maxBar = 8
-[int] $barWidth = 64 # 80 / 128 ?
+[int] $barWidth = 128 # 80 / 128 ?
 [int] $noteHeight = 24
 [int] $lines = 14 # 7 == 1 octave
 # [int] $fullLines = 24 # 12 == 1 octave
@@ -78,7 +78,7 @@ function varDump($array){
 }
 
 function writeNote($x, $y, $w, $ets){
-    [int] $distance = (($w * 57) / 100) - 5
+    [int] $distance = (($w * 44) / 100)
     # [int] $ste = $w - $ets
     # [int] $next = $x + $w
     $SendMouseEvent::mouse_event($MouseLeftDown, 0, 0, 0, 0);
@@ -88,8 +88,18 @@ function writeNote($x, $y, $w, $ets){
     Start-Sleep -m $interval
     $SendMouseEvent::mouse_event($MouseLeftUp, 0, 0, 0, 0);
     Start-Sleep -m $interval
+    $SendMouseEvent::mouse_event($MouseMove, -15, 0, 0, 0)
+    Start-Sleep -m $interval
+    $SendMouseEvent::mouse_event($MouseLeftDown, 0, 0, 0, 0);
+    $SendMouseEvent::mouse_event($MouseLeftUp, 0, 0, 0, 0);
+    $SendMouseEvent::mouse_event($MouseLeftDown, 0, 0, 0, 0);
+    $SendMouseEvent::mouse_event($MouseLeftUp, 0, 0, 0, 0);
+    [System.Windows.Forms.SendKeys]::SendWait("ra")
+    [System.Windows.Forms.SendKeys]::SendWait("{ENTER}")
+    [System.Windows.Forms.SendKeys]::SendWait("{ENTER}")
+    Start-Sleep -m $interval
     # [System.Windows.Forms.Cursor]::Position = New-Object System.Drawing.Point($next, $y)
-    $SendMouseEvent::mouse_event($MouseMove, 5, 0, 0, 0)
+    $SendMouseEvent::mouse_event($MouseMove, 16, 0, 0, 0)
     Start-Sleep -m $interval
     
     [int[]] $tempArray = @($w, $distance)
@@ -112,5 +122,7 @@ writeNote ($startX+$barWidth+$barWidth+$barWidth+$barWidth) $startY $barWidth $e
 writeNote ($startX+$barWidth+$barWidth+$barWidth+$barWidth+$barWidth) $startY $barWidth $endToStart
 
 # 230305 NOTE
-# It is too difficult to calculate the distance of the mouse moving...
+# It is too difficult to calculate the distance of the mouse moving.
+# Especially short notes.
 # I guess that need an array has adjustment values of each note length.
+# I will try to change the width scale from 8 bars to 4 bars and add the moving page function.
