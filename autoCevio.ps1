@@ -1,15 +1,17 @@
 # force this script to run with administrator privileges
 # if (!([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole("Administrators")) { Start-Process powershell.exe "-File `".\autoCevio.ps1`"" -Verb RunAs; exit }
+# Write-Host "Hello World!!"
 If (-not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] 'Administrator')){
     Start-Process -FilePath PowerShell.exe -ArgumentList "-NoLogo -ExecutionPolicy Bypass -File $($MyInvocation.MyCommand.Path)" -Verb RunAs
     Exit
 }
 
-Write-Host "Hello World!!"
+
 
 # change window
 add-type -assembly microsoft.visualbasic
-[microsoft.visualbasic.interaction]::AppActivate("CeVIO AI")
+# [microsoft.visualbasic.interaction]::AppActivate("CeVIO AI")
+[microsoft.visualbasic.interaction]::AppActivate("CLIP STUDIO PAINT EX")
 
 [int] $startX = 482
 [int] $startY = 650
@@ -34,6 +36,7 @@ add-type -assembly microsoft.visualbasic
 [int] $tempo = 120
 [int] $times = 1
 
+# disable mouse temporary
 $Win32 = &{
 $cscode = @"
 [DllImport("User32.dll")]
@@ -43,10 +46,8 @@ bool fBlockIt
 "@
 return (add-type -memberDefinition $cscode -name "Win32ApiFunctions" -passthru)
 }
-
-# disable mouse
 $Win32::BlockInput($TRUE)
-Write-Host "disable mouse"
+# Write-Host "disable mouse"
 
 # declare .NET Framework
 [void] [System.Reflection.Assembly]::LoadWithPartialName("System.Drawing")
