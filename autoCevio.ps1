@@ -1,9 +1,22 @@
-[int] $startX = 226
-[int] $startY = 394
+# force this script to run with administrator privileges
+# if (!([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole("Administrators")) { Start-Process powershell.exe "-File `".\autoCevio.ps1`"" -Verb RunAs; exit }
+If (-not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] 'Administrator')){
+    Start-Process -FilePath PowerShell.exe -ArgumentList "-NoLogo -ExecutionPolicy Bypass -File $($MyInvocation.MyCommand.Path)" -Verb RunAs
+    Exit
+}
+
+Write-Host "Hello World!!"
+
+# change window
+add-type -assembly microsoft.visualbasic
+[microsoft.visualbasic.interaction]::AppActivate("CeVIO AI")
+
+[int] $startX = 482
+[int] $startY = 650
 [int] $endX = 1276
 [int] $endY = 1015
-[int] $maxBar = 8
-[int] $barWidth = 128 # 80 / 128 ?
+[int] $maxBar = 2
+[int] $barWidth = 96 # 80 / 128 ?
 [int] $noteHeight = 24
 [int] $lines = 14 # 7 == 1 octave
 # [int] $fullLines = 24 # 12 == 1 octave
@@ -20,6 +33,20 @@
 [int] $interval = 300 # msec 
 [int] $tempo = 120
 [int] $times = 1
+
+$Win32 = &{
+$cscode = @"
+[DllImport("User32.dll")]
+public static extern bool BlockInput(
+bool fBlockIt
+);
+"@
+return (add-type -memberDefinition $cscode -name "Win32ApiFunctions" -passthru)
+}
+
+# disable mouse
+$Win32::BlockInput($TRUE)
+Write-Host "disable mouse"
 
 # declare .NET Framework
 [void] [System.Reflection.Assembly]::LoadWithPartialName("System.Drawing")
@@ -38,7 +65,9 @@ $MouseLeftUp = 0x0004
 
 # back to the previous window
 # ALT + TAB (move to the previous window)
-[System.Windows.Forms.SendKeys]::SendWait("%{TAB}")
+# [System.Windows.Forms.SendKeys]::SendWait("%{TAB}")
+# Start-Sleep -m 3
+# [System.Windows.Forms.SendKeys]::SendWait("%{TAB}")
 Start-Sleep -m 3000
 
 class CevioNote{
@@ -78,7 +107,7 @@ function varDump($array){
 }
 
 function writeNote($x, $y, $w, $ets){
-    [int] $distance = (($w * 44) / 100)
+    [int] $distance = 43 # 95-96/43 (SynthV.note.length)
     # [int] $ste = $w - $ets
     # [int] $next = $x + $w
     $SendMouseEvent::mouse_event($MouseLeftDown, 0, 0, 0, 0);
@@ -94,12 +123,12 @@ function writeNote($x, $y, $w, $ets){
     $SendMouseEvent::mouse_event($MouseLeftUp, 0, 0, 0, 0);
     $SendMouseEvent::mouse_event($MouseLeftDown, 0, 0, 0, 0);
     $SendMouseEvent::mouse_event($MouseLeftUp, 0, 0, 0, 0);
-    [System.Windows.Forms.SendKeys]::SendWait("ra")
-    [System.Windows.Forms.SendKeys]::SendWait("{ENTER}")
-    [System.Windows.Forms.SendKeys]::SendWait("{ENTER}")
+    # [System.Windows.Forms.SendKeys]::SendWait("ki")
+    # [System.Windows.Forms.SendKeys]::SendWait("{ENTER}")
+    # [System.Windows.Forms.SendKeys]::SendWait("{ENTER}")
     Start-Sleep -m $interval
     # [System.Windows.Forms.Cursor]::Position = New-Object System.Drawing.Point($next, $y)
-    $SendMouseEvent::mouse_event($MouseMove, 16, 0, 0, 0)
+    $SendMouseEvent::mouse_event($MouseMove, 15, 14, 0, 0) # 16/10
     Start-Sleep -m $interval
     
     [int[]] $tempArray = @($w, $distance)
@@ -114,12 +143,16 @@ $notesObject.init($startX, $startY, $barWidth/16, 'i')
 Start-Sleep -m $interval
 
 writeNote $startX $startY $barWidth $endToStart
-writeNote ($startX+$barWidth) $startY $barWidth $endToStart
+writeNote ($startX+$barWidth) ($startY+24) $barWidth $endToStart
 writeNote ($startX+$barWidth+$barWidth) $startY $barWidth $endToStart
-writeNote ($startX+$barWidth+$barWidth) $startY $barWidth $endToStart
+writeNote ($startX+$barWidth+$barWidth) ($startY-24) $barWidth $endToStart
 writeNote ($startX+$barWidth+$barWidth+$barWidth) $startY $barWidth $endToStart
-writeNote ($startX+$barWidth+$barWidth+$barWidth+$barWidth) $startY $barWidth $endToStart
+writeNote ($startX+$barWidth+$barWidth+$barWidth+$barWidth) ($startY+24) $barWidth $endToStart
 writeNote ($startX+$barWidth+$barWidth+$barWidth+$barWidth+$barWidth) $startY $barWidth $endToStart
+
+
+$Win32::BlockInput($FALSE)
+Write-Output "enabled mouse"
 
 # 230305 NOTE
 # It is too difficult to calculate the distance of the mouse moving.
