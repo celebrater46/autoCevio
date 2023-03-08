@@ -11,7 +11,7 @@ If (-not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdent
 # change window
 add-type -assembly microsoft.visualbasic
 # [microsoft.visualbasic.interaction]::AppActivate("CeVIO AI")
-[microsoft.visualbasic.interaction]::AppActivate("CLIP STUDIO PAINT EX")
+[microsoft.visualbasic.interaction]::AppActivate("CLIP STUDIO PAINT")
 
 [int] $startX = 482
 [int] $startY = 650
