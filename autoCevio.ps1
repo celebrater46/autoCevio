@@ -10,8 +10,8 @@ If (-not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdent
 
 # change window
 add-type -assembly microsoft.visualbasic
-# [microsoft.visualbasic.interaction]::AppActivate("CeVIO AI")
-[microsoft.visualbasic.interaction]::AppActivate("CLIP STUDIO PAINT")
+[microsoft.visualbasic.interaction]::AppActivate("CeVIO AI")
+# [microsoft.visualbasic.interaction]::AppActivate("CLIP STUDIO PAINT")
 
 [int] $startX = 482
 [int] $startY = 650
@@ -108,9 +108,9 @@ function varDump($array){
 }
 
 function writeNote($x, $y, $w, $ets){
-    [int] $distance = 43 # 95-96/43 (SynthV.note.length)
+    [int] $distance = 35 # 95-96/43 (SynthV.note.length)
     # [int] $ste = $w - $ets
-    # [int] $next = $x + $w
+    [int] $next = $x + $w
     $SendMouseEvent::mouse_event($MouseLeftDown, 0, 0, 0, 0);
     Start-Sleep -m $interval
     # [System.Windows.Forms.Cursor]::Position = New-Object System.Drawing.Point($end, $y)
@@ -124,12 +124,12 @@ function writeNote($x, $y, $w, $ets){
     $SendMouseEvent::mouse_event($MouseLeftUp, 0, 0, 0, 0);
     $SendMouseEvent::mouse_event($MouseLeftDown, 0, 0, 0, 0);
     $SendMouseEvent::mouse_event($MouseLeftUp, 0, 0, 0, 0);
-    # [System.Windows.Forms.SendKeys]::SendWait("ki")
-    # [System.Windows.Forms.SendKeys]::SendWait("{ENTER}")
-    # [System.Windows.Forms.SendKeys]::SendWait("{ENTER}")
+    [System.Windows.Forms.SendKeys]::SendWait("ki")
+    [System.Windows.Forms.SendKeys]::SendWait("{ENTER}")
+    [System.Windows.Forms.SendKeys]::SendWait("{ENTER}")
     Start-Sleep -m $interval
-    # [System.Windows.Forms.Cursor]::Position = New-Object System.Drawing.Point($next, $y)
-    $SendMouseEvent::mouse_event($MouseMove, 15, 14, 0, 0) # 16/10
+    [System.Windows.Forms.Cursor]::Position = New-Object System.Drawing.Point($next, $y)
+    # $SendMouseEvent::mouse_event($MouseMove, 10, 14, 0, 0) # 16/10
     Start-Sleep -m $interval
     
     [int[]] $tempArray = @($w, $distance)
@@ -146,10 +146,10 @@ Start-Sleep -m $interval
 writeNote $startX $startY $barWidth $endToStart
 writeNote ($startX+$barWidth) ($startY+24) $barWidth $endToStart
 writeNote ($startX+$barWidth+$barWidth) $startY $barWidth $endToStart
-writeNote ($startX+$barWidth+$barWidth) ($startY-24) $barWidth $endToStart
-writeNote ($startX+$barWidth+$barWidth+$barWidth) $startY $barWidth $endToStart
-writeNote ($startX+$barWidth+$barWidth+$barWidth+$barWidth) ($startY+24) $barWidth $endToStart
-writeNote ($startX+$barWidth+$barWidth+$barWidth+$barWidth+$barWidth) $startY $barWidth $endToStart
+writeNote ($startX+$barWidth+$barWidth+$barWidth) ($startY-24) $barWidth $endToStart
+writeNote ($startX+$barWidth+$barWidth+$barWidth+$barWidth) $startY $barWidth $endToStart
+writeNote ($startX+$barWidth+$barWidth+$barWidth+$barWidth+$barWidth) ($startY+24) $barWidth $endToStart
+writeNote ($startX+$barWidth+$barWidth+$barWidth+$barWidth+$barWidth+$barWidth) $startY $barWidth $endToStart
 
 
 $Win32::BlockInput($FALSE)
