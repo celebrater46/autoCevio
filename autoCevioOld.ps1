@@ -37,13 +37,6 @@ add-type -assembly microsoft.visualbasic
 [int] $tempo = 120
 [int] $times = 1
 
-# the higher number, the higher probability
-# array[0] is base note
-[int[]] $upperNotesWeight = @(6, 3, 2, 1, 1, 1, 1, 1)
-
-# the lower number, the lower probability
-[int[]] $lowerNotesWeight = @(6, 3, 2, 1, 1, 1, 1, 1)
-
 # disable mouse temporary
 $Win32 = &{
 $cscode = @"
