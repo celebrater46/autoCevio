@@ -1,4 +1,3 @@
-# [int[]] $notesWeightRatio = $Args[0]
 [int[]] $upperLowerRatio = $Args[0]
 [int[]] $upperNotesWeightRatio = $Args[1]
 [int[]] $lowerNotesWeightRatio = $Args[2]
@@ -31,45 +30,24 @@ function getTempArr($arr){
 function getNextNotesNum($arr, $tempArr){
     $sum = calcSum $arr
     $random = Get-Random -Maximum $sum -Minimum 0
-    # if($random -eq 0) {
-    #     $random = 1
-    # }
     for($k = 0; $k -lt $tempArr.length; $k++){
         if($random -le $tempArr[$k]){
             return $k
         }
-        # return $tempArr.length
     }
 }
 
 function selectNextNote($arr){
     $tempArr = getTempArr $arr
-    # write-host "TEMP-ARR: "
-    # write-host $tempArr
     $nth = getNextNotesNum $arr $tempArr
-    # write-host "NEXT-NOTE: "
-    # write-host $nth
     return $nth
 }
 
 function getNoteNumsY(){  
-    # [int] $currentNotesNumY = [math]::Round(($upperNotesWeightRatio.Length + $lowerNotesWeightRatio.Length) / 2)
     [int] $currentNotesNumY = 8
-    # Write-Host "currentNotesNumY: "
-    # Write-Host $currentNotesNumY
     [int[]] $tempArr = @($currentNotesNumY)
     for($i = 0; $i -lt 7; $i++){
         [bool] $isUp = & "$($PSScriptRoot)\upOrDown.ps1" $upperLowerRatio
-        # $nextNotesNum
-        # if($isUp){
-        #     return & "$($PSScriptRoot)\getNoteNumsY.ps1" $upperNotesWeightRatio
-        # } else {
-        #     return & "$($PSScriptRoot)\getNoteNumsY.ps1" $lowerNotesWeightRatio
-        # }
-        # Write-Host "isUp: "
-        # Write-Host $isUp
-        # Write-Host "nextNotesNum: "
-        # Write-Host $nextNotesNum
         if($isUp){
             [int] $nextNotesNum = selectNextNote $upperNotesWeightRatio
             $currentNotesNumY += $nextNotesNum
@@ -91,15 +69,5 @@ function getNoteNumsY(){
     return $tempArr
 }
 
-# [int] $arrNextNotesNumsY = selectNextNote $upperNotesWeightRatio
 [int[]] $arrNotesNumsY = getNoteNumsY
 return $arrNotesNumsY
-
-# $sumnum
-
-# if(toUpper){
-#     $sumNum = calcSum $upperNotesWeightRatio
-# } else {
-#     $sumNum = calcSum $lowerNotesWeightRatio
-# }
-# write-host $sumNum
