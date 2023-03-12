@@ -38,12 +38,15 @@ add-type -assembly microsoft.visualbasic
 [int] $times = 1
 
 # the higher number, the higher probability
+[int[]] $upperLowerRatio = @(1, 1)
+
 # array[0] is base note
-[int[]] $upperNotesWeight = @(6, 3, 2, 1, 1, 1, 1, 1)
+[int[]] $upperNotesWeightRatio = @(6, 3, 2, 1, 1, 1, 1, 1)
 
 # the lower number, the lower probability
-[int[]] $lowerNotesWeight = @(6, 3, 2, 1, 1, 1, 1, 1)
+[int[]] $lowerNotesWeightRatio = @(6, 3, 2, 1, 1, 1, 1, 1)
 
+[int] $nextNotesNum = & "$($PSScriptRoot)\getNextNote.ps1" $upperLowerRatio $upperNotesWeightRatio $lowerNotesWeightRatio
 # disable mouse temporary
 $Win32 = &{
 $cscode = @"

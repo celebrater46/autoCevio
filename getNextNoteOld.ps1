@@ -1,4 +1,26 @@
-[int[]] $notesWeightRatio = $Args[0]
+# [int[]] $upperLowerRatio = @(1, 1)
+# [int[]] $upperNotesWeight = @(6, 3, 2, 1, 1, 1, 1, 1)
+# [int[]] $lowerNotesWeight = @(8, 3, 2, 1, 1, 1, 1, 1)
+[int[]] $upperLowerRatio = $Args[0]
+[int[]] $upperNotesWeightRatio = $Args[1]
+[int[]] $lowerNotesWeightRatio = $Args[2]
+
+function upperOrLower($ratio){
+    $sum = $ratio[0] + $ratio[1]
+    $random = Get-Random -Maximum $sum -Minimum 0
+    # if($random -eq 0) {
+    #     $random = 1
+    # }
+    write-host "UPPERORLOWER-RANDOM: "
+    write-host $random
+    if($ratio[0] -gt $random){
+        write-host "UPPER: "
+        return $upperNotesWeightRatio
+    } else {
+        write-host "LOWER: "
+        return $lowerNotesWeightRatio
+    }
+}
 
 function calcSum($arr){
     [int] $sum = 0
@@ -40,12 +62,15 @@ function getNextNotesNum($arr, $tempArr){
 }
 
 function selectNextNote($arr){
+    $weightArray = upperOrLower $upperLowerRatio
     $tempArr = getTempArr $arr
-    # write-host "TEMP-ARR: "
-    # write-host $tempArr
-    $nth = getNextNotesNum $arr $tempArr
-    # write-host "NEXT-NOTE: "
-    # write-host $nth
+    write-host "TEMP-ARR: "
+    write-host $tempArr
+    $nth = getNextNotesNum $weightArray $tempArr
+    write-host "NEXT-NOTE: "
+    write-host $nth
+    write-host "weightArray: "
+    write-host $weightArray
     return $nth
 }
 
