@@ -1,6 +1,7 @@
 [int[]] $upperLowerRatio = $Args[0]
 [int[]] $upperNoteWeightRatio = $Args[1]
 [int[]] $lowerNoteWeightRatio = $Args[2]
+[int] $notes = $Args[3]
 
 # function calcSum($arr){
 #     [int] $sum = 0
@@ -46,7 +47,7 @@
 function getNoteNumsY(){  
     [int] $currentNotesNumY = 8
     [int[]] $tempArr = @($currentNotesNumY)
-    for($i = 0; $i -lt 7; $i++){
+    for($i = 0; $i -lt $notes; $i++){
         [bool] $isUp = & "$($PSScriptRoot)\upOrDown.ps1" $upperLowerRatio
         if($isUp){
             # [int] $nextNotesNum = selectNextNote $upperNoteWeightRatio

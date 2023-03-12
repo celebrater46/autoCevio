@@ -4,10 +4,11 @@
 # Write-Host $obj.width
 # Write-Host $obj.char
 
-[int] $barWidth = 1536 # 80 / 128 ?
+[int] $barWidth = 768 # 80 / 128 ?
 [int] $noteHeight = 24
 
 $startX = 100
+$endX = 1752
 $startY = 1016
 $noteLengthArray = @(4, 8, 8, 2)
 $noteHeightArray = @(8, 9, 10, 11)
@@ -19,7 +20,7 @@ function createClasses(){
     for($i = 0; $i -lt $notes; $i++){
         $y = $startY - ($noteHeight * $noteHeightArray[$i])
         $w = $barWidth / $noteLengthArray[$i]
-        $classes += & "$($PSScriptRoot)\classes\CevioNote.ps1" $xSum $y $w '‚ç'
+        $classes += & "$($PSScriptRoot)\classes\CevioNote.ps1" $i $xSum $y $w '‚ç'
         $xSum += $w
     }
     return $classes

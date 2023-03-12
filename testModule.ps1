@@ -9,7 +9,7 @@ $currentNoteHeight = 0
 # the lower number, the lower probability
 [int[]] $lowerNoteWeightRatio = @(6, 3, 2, 1, 1, 1, 1, 1)
 
-[int[]] $noteNumsY = & "$($PSScriptRoot)\modules\getNoteNumsY.ps1" $upperLowerRatio $upperNoteWeightRatio $lowerNoteWeightRatio
+[int[]] $noteNumsY = & "$($PSScriptRoot)\modules\getNoteNumsY.ps1" $upperLowerRatio $upperNoteWeightRatio $lowerNoteWeightRatio 7
 
 Write-Host "noteNumsY"
 Write-Host $noteNumsY

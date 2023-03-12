@@ -1,50 +1,28 @@
-# force this script to run with administrator privileges
-If (-not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] 'Administrator')){
-    Start-Process -FilePath PowerShell.exe -ArgumentList "-NoLogo -ExecutionPolicy Bypass -File $($MyInvocation.MyCommand.Path)" -Verb RunAs
-    Exit
-}
+# $obj = & "$($PSScriptRoot)\classes\CevioNote.ps1" 333 666 99 '‚ð'
+# Write-Host $obj.x
+# Write-Host $obj.y
+# Write-Host $obj.width
+# Write-Host $obj.char
 
-
-
-# change window
-add-type -assembly microsoft.visualbasic
-[microsoft.visualbasic.interaction]::AppActivate("CeVIO AI")
-# [microsoft.visualbasic.interaction]::AppActivate("CLIP STUDIO PAINT")
-
-[int] $startX = 100
-[int] $startY = 722
-[int[]] $Xs = @(2, 2, 2, 2, 2, 2, 1, 1)
-[int] $endX = 1276
-[int] $endY = 1015
-[int] $maxBar = 2
-[int] $barWidth = 96 # 80 / 128 ?
+[int] $barWidth = 768 # 80 / 128 ?
 [int] $noteHeight = 24
-[int] $lines = 14 # 7 == 1 octave
-# [int] $fullLines = 24 # 12 == 1 octave
-[int[]] $linesArray = @(0, 2, 4, 5, 7, 9, 11, 12, 14, 16, 17, 19, 21, 23)
-[int[]] $chordsArray = @(0, 0, 7)
-[int[]] $notesArray = @(2, 4, 8, 16) # 16 == 1/16, 8 == 1/8
-[bool] $chordMode = $FALSE
-[int] $endToStart = 3 # the distance from the click end point to start
-# [int] $shortestNote = 16 
-# [int] $longestNote = 2
-# [int] $notes = $maxBar * $shortestNote
-# [int] $xGap = ($endX-$startX)/$notes
-# [int] $yGap = ($endY-$startY)/$fullLines
-[int] $interval = 300 # msec 
-[int] $tempo = 120
-[int] $times = 1
+[int] $startX = 100
+[int] $endX = 1752
+[int] $startY = 1008
+[int] $notes = 6
+[int] $interval = 50 # msec 
 
-# the higher number, the higher probability
+[int[]] $noteTypes = @(2, 4, 8, 16)
+[int[]] $noteTypeWeightRatio = @(2, 4, 6, 2)
+[int[]] $noteLengthArray = & "$($PSScriptRoot)\modules\getNoteLengthOrderArray.ps1" $noteTypes $noteTypeWeightRatio $notes
+
 [int[]] $upperLowerRatio = @(1, 1)
+[int[]] $upperNoteWeightRatio = @(6, 3, 2, 1, 1, 1, 1, 1)
+[int[]] $lowerNoteWeightRatio = @(6, 3, 2, 1, 1, 1, 1, 1)
+# [int[]] $scaleArray = @(0, 2, 4, 5, 7, 9, 11, 12, 14, 16, 17, 19, 21, 23)
+[int[]] $scaleArray = @(0, 2, 4, 5, 7, 9, 11, 12, 14, 16, 17, 19, 21, 23)
+[int[]] $noteNumsY = & "$($PSScriptRoot)\modules\getNoteNumsY.ps1" $upperLowerRatio $upperNoteWeightRatio $lowerNoteWeightRatio $notes
 
-# array[0] is base note
-[int[]] $upperNotesWeightRatio = @(6, 3, 2, 1, 1, 1, 1, 1)
-
-# the lower number, the lower probability
-[int[]] $lowerNotesWeightRatio = @(6, 3, 2, 1, 1, 1, 1, 1)
-
-[int] $nextNotesNum = & "$($PSScriptRoot)\getNextNote.ps1" $upperLowerRatio $upperNotesWeightRatio $lowerNotesWeightRatio
 # disable mouse temporary
 $Win32 = &{
 $cscode = @"
@@ -56,7 +34,6 @@ bool fBlockIt
 return (add-type -memberDefinition $cscode -name "Win32ApiFunctions" -passthru)
 }
 $Win32::BlockInput($TRUE)
-# Write-Host "disable mouse"
 
 # declare .NET Framework
 [void] [System.Reflection.Assembly]::LoadWithPartialName("System.Drawing")
@@ -67,62 +44,33 @@ $signature=@'
 [DllImport("user32.dll",CharSet=CharSet.Auto,CallingConvention=CallingConvention.StdCall)]
 public static extern void mouse_event(long dwFlags, long dx, long dy, long cButtons, long dwExtraInfo);
 '@
-# $SendMouseClick = Add-Type -memberDefinition $signature -name "Win32MouseEventNew" -namespace Win32Functions -passThru
 $SendMouseEvent = Add-Type -memberDefinition $signature -name "Win32MouseEventNew" -namespace Win32Functions -passThru
 $MouseMove = 0x00000001
 $MouseLeftDown = 0x0002
 $MouseLeftUp = 0x0004
 
-# back to the previous window
-# ALT + TAB (move to the previous window)
-# [System.Windows.Forms.SendKeys]::SendWait("%{TAB}")
-# Start-Sleep -m 3
-# [System.Windows.Forms.SendKeys]::SendWait("%{TAB}")
-Start-Sleep -m 3000
-
-class CevioNote{
-    [int] $startX = 0
-    [int] $startY = 0
-    [int] $width = 33
-    [string] $char = 'a'
-
-    init($x, $y, $w, $ch){
-        $this.startX = $x
-        $this.startY = $y
-        $this.width = $w
-        $this.char = $ch
-        Write-Host $this.startX, $this.startY, $this.width, $this.char
+function createClasses(){
+    $xSum = $startX
+    $classes = @()
+    for($i = 0; $i -lt $notes; $i++){
+        $y = $startY - ($noteHeight * $scaleArray[$noteNumsY[$i] + 1])
+        $w = $barWidth / $noteLengthArray[$i]
+        $classes += & "$($PSScriptRoot)\classes\CevioNote.ps1" $i $xSum $y $w '‚ç'
+        $xSum += $w
     }
-
-    # ste == start to end, ets == end to start
-    # writeNote($ets, $ms, $SendMouseClick){
-    #     [int] $ste = $this.width - $ets
-    #     [System.Windows.Forms.Cursor]::Position = New-Object System.Drawing.Point($this.startX, $this.startY)
-    #     Start-Sleep -m $ms
-    #     $SendMouseClick::mouse_event(0x0002, 0, 0, 0, 0);
-    #     Start-Sleep -m $ms
-    #     [System.Windows.Forms.Cursor]::Position = New-Object System.Drawing.Point($this.startX + $ste, $this.startY)
-    #     Start-Sleep -m $ms
-    #     $SendMouseClick::mouse_event(0x0004, 0, 0, 0, 0);
-    #     Start-Sleep -m $ms
-    #     [System.Windows.Forms.Cursor]::Position = New-Object System.Drawing.Point($this.startX + $this.width, $this.startY)
-    #     Start-Sleep -m $ms
-    # }
+    return $classes
 }
 
-function varDump($array){
-    foreach($item in $array){
-        Write-Host $item
+function writeNote($class){
+    # [int] $distance = 35 # 95-96/43 (SynthV.note.length)
+    [int] $distance = $class.width * 3 / 8
+    if($class.id -eq 0){
+        $distance *= 1.3
     }
-}
-
-function writeNote($x, $y, $w, $ets, $char){
-    [int] $distance = 35 # 95-96/43 (SynthV.note.length)
-    # [int] $ste = $w - $ets
-    [int] $next = $x + $w
+    [System.Windows.Forms.Cursor]::Position = New-Object System.Drawing.Point($class.x, $class.y)
+    Start-Sleep -m $interval
     $SendMouseEvent::mouse_event($MouseLeftDown, 0, 0, 0, 0);
     Start-Sleep -m $interval
-    # [System.Windows.Forms.Cursor]::Position = New-Object System.Drawing.Point($end, $y)
     $SendMouseEvent::mouse_event($MouseMove, $distance, 0, 0, 0)
     Start-Sleep -m $interval
     $SendMouseEvent::mouse_event($MouseLeftUp, 0, 0, 0, 0);
@@ -133,39 +81,24 @@ function writeNote($x, $y, $w, $ets, $char){
     $SendMouseEvent::mouse_event($MouseLeftUp, 0, 0, 0, 0);
     $SendMouseEvent::mouse_event($MouseLeftDown, 0, 0, 0, 0);
     $SendMouseEvent::mouse_event($MouseLeftUp, 0, 0, 0, 0);
-    [System.Windows.Forms.SendKeys]::SendWait($char)
+    [System.Windows.Forms.SendKeys]::SendWait($class.char)
     [System.Windows.Forms.SendKeys]::SendWait("{ENTER}")
     [System.Windows.Forms.SendKeys]::SendWait("{ENTER}")
     Start-Sleep -m $interval
-    [System.Windows.Forms.Cursor]::Position = New-Object System.Drawing.Point($next, $y)
-    # $SendMouseEvent::mouse_event($MouseMove, 10, 14, 0, 0) # 16/10
-    Start-Sleep -m $interval
-    
-    [int[]] $tempArray = @($w, $distance)
-    varDump $tempArray
 }
 
-$notesObject = New-Object CevioNote
-$notesObject.init($startX, $startY, $barWidth/16, 'i')
-# $notesObject.writeNote($startX, $startY, $barWidth/16, 'i')
+$classArray = createClasses
 
-[System.Windows.Forms.Cursor]::Position = New-Object System.Drawing.Point($startX, $startY)
-Start-Sleep -m $interval
+# change window
+add-type -assembly microsoft.visualbasic
+[microsoft.visualbasic.interaction]::AppActivate("CeVIO AI")
+Start-Sleep -m 3000
 
-writeNote $startX $startY $barWidth $endToStart "ha"
-writeNote ($startX+$barWidth) ($startY+24) $barWidth $endToStart "ta"
-writeNote ($startX+$barWidth+$barWidth) $startY $barWidth $endToStart "ra"
-writeNote ($startX+$barWidth+$barWidth+$barWidth) ($startY-24) $barWidth $endToStart "ki"
-writeNote ($startX+$barWidth+$barWidth+$barWidth+$barWidth) $startY $barWidth $endToStart "ta"
-writeNote ($startX+$barWidth+$barWidth+$barWidth+$barWidth+$barWidth) ($startY+24) $barWidth $endToStart "ku"
-writeNote ($startX+$barWidth+$barWidth+$barWidth+$barWidth+$barWidth+$barWidth) $startY $barWidth $endToStart "na"
+for($i = 0; $i -lt $classArray.length; $i++){
+    writeNote $classArray[$i]
+}
 
+[System.Windows.Forms.SendKeys]::SendWait(" ")
 
-$Win32::BlockInput($FALSE)
-Write-Output "enabled mouse"
-
-# 230305 NOTE
-# It is too difficult to calculate the distance of the mouse moving.
-# Especially short notes.
-# I guess that need an array has adjustment values of each note length.
-# I will try to change the width scale from 8 bars to 4 bars and add the moving page function.
+Write-Host "classArray:"
+Write-Host $classArray
