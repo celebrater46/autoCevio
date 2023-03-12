@@ -4,24 +4,24 @@ $currentNoteHeight = 0
 [int[]] $upperLowerRatio = @(1, 1)
 
 # array[0] is base note
-[int[]] $upperNotesWeightRatio = @(6, 3, 2, 1, 1, 1, 1, 1)
+[int[]] $upperNoteWeightRatio = @(6, 3, 2, 1, 1, 1, 1, 1)
 
 # the lower number, the lower probability
-[int[]] $lowerNotesWeightRatio = @(6, 3, 2, 1, 1, 1, 1, 1)
+[int[]] $lowerNoteWeightRatio = @(6, 3, 2, 1, 1, 1, 1, 1)
 
-[int[]] $noteNumsY = & "$($PSScriptRoot)\getNoteNumsY.ps1" $upperLowerRatio $upperNotesWeightRatio $lowerNotesWeightRatio
+[int[]] $noteNumsY = & "$($PSScriptRoot)\getNoteNumsY.ps1" $upperLowerRatio $upperNoteWeightRatio $lowerNoteWeightRatio
 
 Write-Host "noteNumsY"
 Write-Host $noteNumsY
 # function getNextNum(){
 #     if($isUp){
-#         return & "$($PSScriptRoot)\getNoteNumsY.ps1" $upperNotesWeightRatio
+#         return & "$($PSScriptRoot)\getNoteNumsY.ps1" $upperNoteWeightRatio
 #     } else {
-#         return & "$($PSScriptRoot)\getNoteNumsY.ps1" $lowerNotesWeightRatio
+#         return & "$($PSScriptRoot)\getNoteNumsY.ps1" $lowerNoteWeightRatio
 #     }
 # }
 
-# # [int] $currentNotesNumY = [math]::Round(($upperNotesWeightRatio.Length + $lowerNotesWeightRatio.Length) / 2)
+# # [int] $currentNotesNumY = [math]::Round(($upperNoteWeightRatio.Length + $lowerNoteWeightRatio.Length) / 2)
 # [int] $currentNotesNumY = 8
 # # Write-Host "currentNotesNumY: "
 # # Write-Host $currentNotesNumY
@@ -35,7 +35,7 @@ Write-Host $noteNumsY
 #     # Write-Host $nextNotesNum
 #     if($isUp){
 #         $currentNotesNumY += $nextNotesNum
-#         $maxNum = $upperNotesWeightRatio.Length + $lowerNotesWeightRatio.Length - 1
+#         $maxNum = $upperNoteWeightRatio.Length + $lowerNoteWeightRatio.Length - 1
 #         if($currentNotesNumY -gt $maxNum){
 #             $currentNotesNumY = $maxNum
 #         }

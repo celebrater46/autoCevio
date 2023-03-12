@@ -1,4 +1,4 @@
-[int[]] $notesWeightRatio = $args[0]
+[int[]] $noteWeightRatio = $args[0]
 
 function calcSum($arr){
     [int] $sum = 0
@@ -41,5 +41,5 @@ function getNextNoteNum($arr){
     return $nth
 }
 
-[int] $nextNotesNum = getNextNoteNum $notesWeightRatio
+[int] $nextNotesNum = getNextNoteNum $noteWeightRatio
 return $nextNotesNum

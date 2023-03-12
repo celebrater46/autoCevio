@@ -1,9 +1,9 @@
 # [int[]] $upperLowerRatio = @(1, 1)
-# [int[]] $upperNotesWeight = @(6, 3, 2, 1, 1, 1, 1, 1)
-# [int[]] $lowerNotesWeight = @(8, 3, 2, 1, 1, 1, 1, 1)
+# [int[]] $upperNoteWeight = @(6, 3, 2, 1, 1, 1, 1, 1)
+# [int[]] $lowerNoteWeight = @(8, 3, 2, 1, 1, 1, 1, 1)
 [int[]] $upperLowerRatio = $Args[0]
-[int[]] $upperNotesWeightRatio = $Args[1]
-[int[]] $lowerNotesWeightRatio = $Args[2]
+[int[]] $upperNoteWeightRatio = $Args[1]
+[int[]] $lowerNoteWeightRatio = $Args[2]
 
 function upperOrLower($ratio){
     $sum = $ratio[0] + $ratio[1]
@@ -15,10 +15,10 @@ function upperOrLower($ratio){
     write-host $random
     if($ratio[0] -gt $random){
         write-host "UPPER: "
-        return $upperNotesWeightRatio
+        return $upperNoteWeightRatio
     } else {
         write-host "LOWER: "
-        return $lowerNotesWeightRatio
+        return $lowerNoteWeightRatio
     }
 }
 
@@ -74,14 +74,14 @@ function selectNextNote($arr){
     return $nth
 }
 
-[int] $nextNotesNum = selectNextNote $upperNotesWeightRatio
+[int] $nextNotesNum = selectNextNote $upperNoteWeightRatio
 return $nextNotesNum
 
 # $sumnum
 
 # if(toUpper){
-#     $sumNum = calcSum $upperNotesWeightRatio
+#     $sumNum = calcSum $upperNoteWeightRatio
 # } else {
-#     $sumNum = calcSum $lowerNotesWeightRatio
+#     $sumNum = calcSum $lowerNoteWeightRatio
 # }
 # write-host $sumNum

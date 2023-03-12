@@ -1,6 +1,6 @@
 [int[]] $upperLowerRatio = $Args[0]
-[int[]] $upperNotesWeightRatio = $Args[1]
-[int[]] $lowerNotesWeightRatio = $Args[2]
+[int[]] $upperNoteWeightRatio = $Args[1]
+[int[]] $lowerNoteWeightRatio = $Args[2]
 
 # function calcSum($arr){
 #     [int] $sum = 0
@@ -49,16 +49,16 @@ function getNoteNumsY(){
     for($i = 0; $i -lt 7; $i++){
         [bool] $isUp = & "$($PSScriptRoot)\upOrDown.ps1" $upperLowerRatio
         if($isUp){
-            # [int] $nextNotesNum = selectNextNote $upperNotesWeightRatio
-            [int] $nextNotesNum = & "$($PSScriptRoot)\getNextNoteNum.ps1" $upperNotesWeightRatio
+            # [int] $nextNotesNum = selectNextNote $upperNoteWeightRatio
+            [int] $nextNotesNum = & "$($PSScriptRoot)\getNextNoteNum.ps1" $upperNoteWeightRatio
             $currentNotesNumY += $nextNotesNum
-            $maxNum = $upperNotesWeightRatio.Length + $lowerNotesWeightRatio.Length - 1
+            $maxNum = $upperNoteWeightRatio.Length + $lowerNoteWeightRatio.Length - 1
             if($currentNotesNumY -gt $maxNum){
                 $currentNotesNumY = $maxNum
             }
         } else {
-            # [int] $nextNotesNum = selectNextNote $lowerNotesWeightRatio
-            [int] $nextNotesNum = & "$($PSScriptRoot)\getNextNoteNum.ps1" $lowerNotesWeightRatio
+            # [int] $nextNotesNum = selectNextNote $lowerNoteWeightRatio
+            [int] $nextNotesNum = & "$($PSScriptRoot)\getNextNoteNum.ps1" $lowerNoteWeightRatio
             $currentNotesNumY -= $nextNotesNum
             if($currentNotesNumY -lt 1){
                 $currentNotesNumY = 1
