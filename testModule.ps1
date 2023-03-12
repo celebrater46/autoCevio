@@ -1,3 +1,5 @@
+$currentNoteHeight = 0
+
 # the higher number, the higher probability
 [int[]] $upperLowerRatio = @(1, 1)
 
@@ -7,14 +9,35 @@
 # the lower number, the lower probability
 [int[]] $lowerNotesWeightRatio = @(6, 3, 2, 1, 1, 1, 1, 1)
 
-[int] $isUp = & "$($PSScriptRoot)\upOrDown.ps1" $upperLowerRatio
-
-[int] $nextNotesNum
-if($isUp){
-    $nextNotesNum = & "$($PSScriptRoot)\getNextNote.ps1" $upperNotesWeightRatio
-} else {
-    $nextNotesNum = & "$($PSScriptRoot)\getNextNote.ps1" $lowerNotesWeightRatio
+function getNextNum(){
+    if($isUp){
+        return & "$($PSScriptRoot)\getNextNote.ps1" $upperNotesWeightRatio
+    } else {
+        return & "$($PSScriptRoot)\getNextNote.ps1" $lowerNotesWeightRatio
+    }
 }
 
-Write-Host "nextNotesNum: "
-Write-Host $nextNotesNum
+$currentNotesNumY = 8
+for($i = 0; $i -lt 7; $i++){
+    [bool] $isUp = & "$($PSScriptRoot)\upOrDown.ps1" $upperLowerRatio
+    # Write-Host "isUp: "
+    # Write-Host $isUp
+    [int] $nextNotesNum = getNextNum
+    # Write-Host "nextNotesNum: "
+    # Write-Host $nextNotesNum
+    if($isUp){
+        $currentNotesNumY += $nextNotesNum
+        $maxNum = $upperNotesWeightRatio.Length + $lowerNotesWeightRatio.Length - 1
+        if($currentNotesNumY -gt $maxNum){
+            $currentNotesNumY = $maxNum
+        }
+    } else {
+        $currentNotesNumY -= $nextNotesNum
+        if($currentNotesNumY -lt 1){
+            $currentNotesNumY = 1
+        }
+    }
+    Write-Host "currentNotesNumY: "
+    Write-Host $currentNotesNumY
+}
+
